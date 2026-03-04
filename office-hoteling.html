@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chicago Office · Hoteling</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0f1f38;
+    --navy-mid: #1a3252;
+    --navy-light: #254b78;
+    --accent: #e8a030;
+    --accent-soft: #f5c97a;
+    --cream: #f9f6f0;
+    --white: #ffffff;
+    --text: #1a1a2e;
+    --muted: #6b7a99;
+    --border: #dde3ef;
+    --success: #2e8b57;
+    --danger: #c0392b;
+    --warn: #d97706;
+    --card-shadow: 0 2px 16px rgba(15,31,56,0.10);
+    --hover-shadow: 0 8px 32px rgba(15,31,56,0.16);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--navy);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.25);
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .logo-text { color: white; }
+  .logo-text strong { font-family: 'DM Serif Display', serif; font-size: 18px; letter-spacing: -0.3px; }
+  .logo-text span { display: block; font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; margin-top: -2px; }
+
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .user-pill {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 24px;
+    padding: 6px 14px 6px 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .user-pill:hover { background: rgba(255,255,255,0.18); }
+  .user-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: var(--navy);
+  }
+  .user-pill span { color: white; font-size: 13px; font-weight: 500; }
+  .user-select {
+    background: transparent; border: none; color: white; font-size: 13px;
+    font-family: 'DM Sans', sans-serif; cursor: pointer; font-weight: 500;
+  }
+  .user-select option { background: var(--navy); color: white; }
+
+  /* MAIN LAYOUT */
+  .page { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+  /* DATE NAV */
+  .date-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px; gap: 16px; flex-wrap: wrap;
+  }
+  .date-nav-left { display: flex; align-items: center; gap: 12px; }
+  .date-label {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px; color: var(--navy);
+    letter-spacing: -0.5px;
+  }
+  .date-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .nav-btn {
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: white; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: var(--navy);
+    transition: all 0.2s;
+  }
+  .nav-btn:hover { background: var(--navy); color: white; border-color: var(--navy); }
+  .today-btn {
+    padding: 8px 16px;
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 8px; font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--navy); cursor: pointer; font-weight: 500;
+    transition: all 0.2s;
+  }
+  .today-btn:hover { background: var(--navy); color: white; border-color: var(--navy); }
+  .date-input-wrap { position: relative; }
+  .date-input {
+    padding: 8px 12px 8px 36px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px; font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    background: white; color: var(--text); cursor: pointer;
+  }
+  .date-input:focus { outline: none; border-color: var(--navy); }
+  .date-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 15px; pointer-events: none; }
+
+  /* WEEK STRIP */
+  .week-strip {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 8px; margin-bottom: 28px;
+  }
+  .week-day {
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .week-day:hover { border-color: var(--navy-light); box-shadow: var(--hover-shadow); }
+  .week-day.active {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: white;
+  }
+  .week-day.active .wd-label, .week-day.active .wd-count { color: rgba(255,255,255,0.7); }
+  .week-day.active .wd-num { color: white; }
+  .wd-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); font-weight: 600; }
+  .wd-num { font-size: 22px; font-family: 'DM Serif Display', serif; color: var(--navy); margin: 2px 0; }
+  .week-day.active .wd-num { color: white; }
+  .wd-count { font-size: 11px; color: var(--muted); }
+  .wd-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); margin: 4px auto 0;
+    display: none;
+  }
+  .week-day.has-bookings .wd-dot { display: block; }
+  .week-day.active .wd-dot { background: var(--accent-soft); display: block; }
+
+  /* STATS ROW */
+  .stats-row {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 16px; margin-bottom: 28px;
+  }
+  .stat-card {
+    background: white; border-radius: 12px;
+    padding: 18px 20px;
+    box-shadow: var(--card-shadow);
+    border: 1.5px solid var(--border);
+  }
+  .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); font-weight: 600; }
+  .stat-value { font-size: 32px; font-family: 'DM Serif Display', serif; color: var(--navy); margin: 4px 0 2px; line-height: 1; }
+  .stat-sub { font-size: 12px; color: var(--muted); }
+  .stat-card.accent { background: var(--navy); border-color: var(--navy); }
+  .stat-card.accent .stat-label, .stat-card.accent .stat-sub { color: rgba(255,255,255,0.5); }
+  .stat-card.accent .stat-value { color: var(--accent); }
+
+  /* MAIN GRID */
+  .main-grid { display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
+
+  /* OFFICES LIST */
+  .panel { background: white; border-radius: 16px; box-shadow: var(--card-shadow); border: 1.5px solid var(--border); overflow: hidden; }
+  .panel-header {
+    padding: 20px 24px;
+    border-bottom: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .panel-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--navy); }
+  .panel-actions { display: flex; gap: 8px; }
+
+  .filter-tabs { display: flex; gap: 4px; }
+  .ftab {
+    padding: 6px 12px; border-radius: 6px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+    color: var(--muted); background: transparent;
+  }
+  .ftab:hover { color: var(--navy); }
+  .ftab.active { background: var(--navy); color: white; border-color: var(--navy); }
+
+  /* OFFICE ROWS */
+  .office-row {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 16px;
+    transition: background 0.15s;
+  }
+  .office-row:last-child { border-bottom: none; }
+  .office-row:hover { background: #f8f9fc; }
+
+  .office-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .office-icon.exec { background: #e8f0fe; }
+  .office-icon.conf { background: #fef3e2; }
+  .office-icon.open { background: #e6f4ea; }
+
+  .office-info { flex: 1; min-width: 0; }
+  .office-name { font-size: 15px; font-weight: 600; color: var(--navy); }
+  .office-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .office-status { flex-shrink: 0; text-align: right; }
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+  }
+  .status-badge.available { background: #e6f4ea; color: var(--success); }
+  .status-badge.occupied { background: #fdecea; color: var(--danger); }
+  .status-badge.reserved { background: #fef3e2; color: var(--warn); }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  .booking-info { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .booking-person { font-weight: 600; color: var(--text); }
+
+  .book-btn {
+    padding: 7px 16px;
+    background: var(--navy);
+    color: white; border: none;
+    border-radius: 8px; font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer; font-weight: 500;
+    transition: all 0.2s; margin-left: 12px; flex-shrink: 0;
+  }
+  .book-btn:hover { background: var(--navy-light); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(15,31,56,0.25); }
+  .book-btn.cancel { background: transparent; color: var(--danger); border: 1.5px solid #fca5a5; }
+  .book-btn.cancel:hover { background: #fdecea; transform: none; box-shadow: none; }
+  .book-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* SIDEBAR */
+  .sidebar-stack { display: flex; flex-direction: column; gap: 16px; }
+
+  /* QUICK BOOK */
+  .quick-book-form { padding: 20px 24px; }
+  .form-group { margin-bottom: 16px; }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; display: block; margin-bottom: 6px; }
+  .form-control {
+    width: 100%; padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px; font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text); background: white;
+    transition: border-color 0.15s;
+    appearance: none;
+  }
+  .form-control:focus { outline: none; border-color: var(--navy); }
+  .form-control option { color: var(--text); }
+
+  .submit-btn {
+    width: 100%; padding: 12px;
+    background: var(--accent);
+    color: var(--navy);
+    border: none; border-radius: 8px;
+    font-size: 14px; font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .submit-btn:hover { background: var(--accent-soft); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(232,160,48,0.4); }
+
+  /* ACTIVITY FEED */
+  .activity-list { padding: 0; }
+  .activity-item {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--navy);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: var(--accent);
+    flex-shrink: 0;
+  }
+  .activity-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+  .activity-text strong { color: var(--navy); }
+  .activity-time { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(15,31,56,0.55);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: none; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white; border-radius: 20px;
+    width: 100%; max-width: 480px;
+    box-shadow: 0 24px 64px rgba(15,31,56,0.3);
+    overflow: hidden;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .modal-header {
+    padding: 24px 28px 20px;
+    border-bottom: 1.5px solid var(--border);
+    display: flex; align-items: flex-start; justify-content: space-between;
+  }
+  .modal-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--navy); }
+  .modal-subtitle { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .modal-close {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--cream); border: none;
+    font-size: 18px; cursor: pointer; color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .modal-close:hover { background: var(--border); color: var(--text); }
+  .modal-body { padding: 24px 28px; }
+  .modal-footer {
+    padding: 16px 28px 24px;
+    display: flex; gap: 10px; justify-content: flex-end;
+  }
+  .btn-secondary {
+    padding: 10px 20px; background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 8px; font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text); cursor: pointer; font-weight: 500;
+    transition: all 0.15s;
+  }
+  .btn-secondary:hover { background: var(--cream); }
+  .btn-primary {
+    padding: 10px 24px; background: var(--navy);
+    border: none; border-radius: 8px; font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: white; cursor: pointer; font-weight: 600;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover { background: var(--navy-light); }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--navy); color: white;
+    padding: 14px 20px; border-radius: 12px;
+    font-size: 14px; font-weight: 500;
+    box-shadow: 0 8px 32px rgba(15,31,56,0.35);
+    z-index: 300;
+    display: flex; align-items: center; gap: 10px;
+    transform: translateY(80px); opacity: 0;
+    transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    max-width: 360px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-left: 4px solid #34d399; }
+  .toast.error { border-left: 4px solid #f87171; }
+  .toast-icon { font-size: 18px; }
+
+  /* CONFLICT BANNER */
+  .conflict-banner {
+    background: #fef3e2; border: 1.5px solid #fcd34d;
+    border-radius: 10px; padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 13px; color: #92400e;
+    display: none;
+  }
+  .conflict-banner.show { display: flex; }
+
+  /* M365 BADGE */
+  .m365-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #e8f0fe; color: #1a56db;
+    padding: 3px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  @media (max-width: 900px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .week-strip { gap: 6px; }
+  }
+  @media (max-width: 600px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .week-strip { grid-template-columns: repeat(5, 1fr); }
+    .wd-num { font-size: 18px; }
+    header { padding: 0 16px; }
+    .page { padding: 20px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🏢</div>
+    <div class="logo-text">
+      <strong>Chicago Office</strong>
+      <span>Hoteling System</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="user-pill">
+      <div class="user-avatar" id="avatarInitials">SL</div>
+      <select class="user-select" id="userSelect" onchange="switchUser(this.value)">
+        <option value="Sarah L.">Sarah L.</option>
+        <option value="Marcus T.">Marcus T.</option>
+        <option value="Priya M.">Priya M.</option>
+        <option value="James R.">James R.</option>
+      </select>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- DATE NAV -->
+  <div class="date-nav">
+    <div class="date-nav-left">
+      <button class="nav-btn" onclick="shiftWeek(-1)">‹</button>
+      <div>
+        <div class="date-label" id="weekLabel">Week of Mar 3</div>
+        <div class="date-sub" id="dateSubLabel">5 offices · Chicago, IL</div>
+      </div>
+      <button class="nav-btn" onclick="shiftWeek(1)">›</button>
+      <button class="today-btn" onclick="goToday()">Today</button>
+    </div>
+    <div class="date-input-wrap">
+      <span class="date-icon">📅</span>
+      <input type="date" class="date-input" id="datePicker" onchange="onDatePick(this.value)">
+    </div>
+  </div>
+
+  <!-- WEEK STRIP -->
+  <div class="week-strip" id="weekStrip"></div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card accent">
+      <div class="stat-label">Available Today</div>
+      <div class="stat-value" id="statAvail">—</div>
+      <div class="stat-sub">offices open</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Reserved Today</div>
+      <div class="stat-value" id="statBooked">—</div>
+      <div class="stat-sub">confirmed bookings</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Capacity</div>
+      <div class="stat-value">5</div>
+      <div class="stat-sub">hotel offices</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Your Bookings</div>
+      <div class="stat-value" id="statMine">—</div>
+      <div class="stat-sub">this week</div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+
+    <!-- OFFICES PANEL -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title" id="officeListTitle">Thursday, March 6</div>
+        <div class="filter-tabs">
+          <button class="ftab active" onclick="setFilter('all',this)">All</button>
+          <button class="ftab" onclick="setFilter('available',this)">Available</button>
+          <button class="ftab" onclick="setFilter('reserved',this)">Reserved</button>
+        </div>
+      </div>
+      <div id="officeList"></div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar-stack">
+
+      <!-- QUICK BOOK -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Quick Reserve</div>
+          </div>
+          <span class="m365-tag">📧 M365</span>
+        </div>
+        <div class="quick-book-form">
+          <div class="conflict-banner" id="conflictBanner">
+            ⚠️ <span id="conflictMsg">Conflict detected.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Executive / Guest</label>
+            <input class="form-control" id="guestName" type="text" placeholder="e.g. David Chen" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Office</label>
+            <select class="form-control" id="officeSelect"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input class="form-control" id="bookDate" type="date" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Time</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <select class="form-control" id="timeStart">
+                <option value="08:00">8:00 AM</option><option value="09:00">9:00 AM</option>
+                <option value="10:00">10:00 AM</option><option value="11:00">11:00 AM</option>
+                <option value="12:00">12:00 PM</option><option value="13:00">1:00 PM</option>
+                <option value="14:00">2:00 PM</option><option value="15:00">3:00 PM</option>
+                <option value="16:00">4:00 PM</option>
+              </select>
+              <select class="form-control" id="timeEnd">
+                <option value="12:00">12:00 PM</option><option value="13:00">1:00 PM</option>
+                <option value="14:00">2:00 PM</option><option value="15:00">3:00 PM</option>
+                <option value="16:00">4:00 PM</option><option value="17:00">5:00 PM</option>
+                <option value="18:00">6:00 PM</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes (optional)</label>
+            <input class="form-control" id="bookNotes" type="text" placeholder="e.g. Needs AV setup" />
+          </div>
+          <button class="submit-btn" onclick="quickBook()">📅 Reserve & Send Calendar Invite</button>
+        </div>
+      </div>
+
+      <!-- ACTIVITY -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Recent Activity</div>
+        </div>
+        <div class="activity-list" id="activityFeed"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="bookModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalTitle">Reserve Office</div>
+        <div class="modal-subtitle" id="modalSubtitle">Fill in details below</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="conflict-banner" id="modalConflict">
+        ⚠️ <span id="modalConflictMsg"></span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Executive / Guest Name</label>
+        <input class="form-control" id="modalGuest" type="text" placeholder="Who is using this office?" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input class="form-control" id="modalDate" type="date" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Time</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <select class="form-control" id="modalStart">
+            <option value="08:00">8:00 AM</option><option value="09:00">9:00 AM</option>
+            <option value="10:00">10:00 AM</option><option value="11:00">11:00 AM</option>
+            <option value="12:00">12:00 PM</option><option value="13:00">1:00 PM</option>
+            <option value="14:00">2:00 PM</option><option value="15:00">3:00 PM</option>
+            <option value="16:00">4:00 PM</option>
+          </select>
+          <select class="form-control" id="modalEnd">
+            <option value="12:00">12:00 PM</option><option value="13:00">1:00 PM</option>
+            <option value="14:00">2:00 PM</option><option value="15:00">3:00 PM</option>
+            <option value="16:00">4:00 PM</option><option value="17:00">5:00 PM</option>
+            <option value="18:00">6:00 PM</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <input class="form-control" id="modalNotes" type="text" placeholder="Special requirements, AV, visitor access, etc." />
+      </div>
+      <div style="background:var(--cream);border-radius:8px;padding:12px;font-size:12px;color:var(--muted);margin-top:4px;">
+        📧 A calendar invite will be sent via <strong>Microsoft Outlook</strong> to all 4 coordinators when you confirm.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="confirmBook()">Confirm Reservation</button>
+    </div>
+  </div>
+</div>
+
+<!-- CANCEL MODAL -->
+<div class="modal-overlay" id="cancelModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Cancel Reservation</div>
+        <div class="modal-subtitle" id="cancelSubtitle">This will notify all coordinators</div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('cancelModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:var(--text);line-height:1.6;" id="cancelBody">Are you sure you want to cancel this reservation?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="document.getElementById('cancelModal').classList.remove('open')">Keep It</button>
+      <button class="btn-primary" style="background:var(--danger);" onclick="confirmCancel()">Yes, Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toastIcon">✅</span>
+  <span id="toastMsg">Reservation confirmed</span>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────
+const OFFICES = [
+  { id: 'exec-a', name: 'Executive Suite A', icon: '👔', type: 'exec', floor: '14th Floor', features: 'Private · Whiteboard · AV · Window' },
+  { id: 'exec-b', name: 'Executive Suite B', icon: '👔', type: 'exec', floor: '14th Floor', features: 'Private · Phone · Window' },
+  { id: 'exec-c', name: 'Director Office C', icon: '🪑', type: 'exec', floor: '13th Floor', features: 'Semi-private · Sit-stand Desk' },
+  { id: 'conf-1', name: 'Focus Room 1', icon: '💼', type: 'conf', floor: '12th Floor', features: 'Phone booth style · Quiet zone' },
+  { id: 'open-1', name: 'Open Workspace D', icon: '🖥️', type: 'open', floor: '12th Floor', features: 'Shared · 2 desks · Casual' },
+];
+
+const USERS = ['Sarah L.', 'Marcus T.', 'Priya M.', 'James R.'];
+const COLORS = { 'Sarah L.': '#e8a030', 'Marcus T.': '#3b82f6', 'Priya M.': '#8b5cf6', 'James R.': '#10b981' };
+
+let currentUser = 'Sarah L.';
+let currentDate = new Date();
+currentDate.setHours(0,0,0,0);
+let currentFilter = 'all';
+let pendingBookOfficeId = null;
+let pendingCancelId = null;
+
+// Seed bookings
+const today = new Date(); today.setHours(0,0,0,0);
+const fmt = d => d.toISOString().split('T')[0];
+const addDays = (d, n) => { let x = new Date(d); x.setDate(x.getDate()+n); return x; };
+
+let bookings = [
+  { id: 'b1', officeId: 'exec-a', guest: 'Jennifer Walsh (SVP)', date: fmt(today), start: '09:00', end: '17:00', bookedBy: 'Sarah L.', notes: 'Board prep meeting' },
+  { id: 'b2', officeId: 'exec-b', guest: 'Robert Kim (CFO)', date: fmt(addDays(today,1)), start: '08:00', end: '12:00', bookedBy: 'Marcus T.', notes: '' },
+  { id: 'b3', officeId: 'exec-c', guest: 'Alicia Torres', date: fmt(today), start: '10:00', end: '15:00', bookedBy: 'Priya M.', notes: 'Needs badge access' },
+  { id: 'b4', officeId: 'conf-1', guest: 'David Park', date: fmt(addDays(today,2)), start: '13:00', end: '17:00', bookedBy: 'James R.', notes: '' },
+  { id: 'b5', officeId: 'open-1', guest: 'Nina Okafor', date: fmt(addDays(today,-1)), start: '09:00', end: '14:00', bookedBy: 'Sarah L.', notes: '' },
+];
+
+let activity = [
+  { user: 'Marcus T.', action: 'reserved', office: 'Executive Suite B', guest: 'Robert Kim (CFO)', time: '2 min ago' },
+  { user: 'Priya M.', action: 'reserved', office: 'Director Office C', guest: 'Alicia Torres', time: '1 hr ago' },
+  { user: 'Sarah L.', action: 'reserved', office: 'Executive Suite A', guest: 'Jennifer Walsh', time: '3 hr ago' },
+  { user: 'James R.', action: 'cancelled', office: 'Focus Room 1', guest: 'Tom Nguyen', time: 'Yesterday' },
+];
+
+// ─── HELPERS ─────────────────────────────────────────────
+function getWeekStart(d) {
+  let x = new Date(d);
+  let day = x.getDay();
+  let diff = day === 0 ? -6 : 1 - day;
+  x.setDate(x.getDate() + diff);
+  x.setHours(0,0,0,0);
+  return x;
+}
+
+function fmtDate(d) {
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+function fmtDateLong(d) {
+  return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+}
+function fmtDay(d) {
+  return d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+}
+function initials(name) {
+  return name.split(' ').map(p => p[0]).join('').slice(0,2).toUpperCase();
+}
+function fmt12(t) {
+  const [h, m] = t.split(':');
+  const hr = parseInt(h);
+  return (hr > 12 ? hr-12 : hr || 12) + ':' + m + ' ' + (hr >= 12 ? 'PM' : 'AM');
+}
+
+function getBookingsForDate(dateStr) {
+  return bookings.filter(b => b.date === dateStr);
+}
+function getBookingForOfficeDate(officeId, dateStr) {
+  return bookings.find(b => b.officeId === officeId && b.date === dateStr);
+}
+
+// ─── RENDER ───────────────────────────────────────────────
+function render() {
+  renderWeekStrip();
+  renderStats();
+  renderOfficeList();
+  renderActivity();
+  renderQuickBookOffices();
+  updateHeader();
+}
+
+function updateHeader() {
+  const ws = getWeekStart(currentDate);
+  const we = addDays(ws, 4);
+  document.getElementById('weekLabel').textContent = `Week of ${fmtDate(ws)}`;
+  document.getElementById('officeListTitle').textContent = fmtDateLong(currentDate);
+  const picker = document.getElementById('datePicker');
+  picker.value = fmt(currentDate);
+}
+
+function renderWeekStrip() {
+  const ws = getWeekStart(currentDate);
+  const strip = document.getElementById('weekStrip');
+  strip.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const d = addDays(ws, i);
+    const ds = fmt(d);
+    const dayBookings = getBookingsForDate(ds);
+    const isActive = fmt(currentDate) === ds;
+    const div = document.createElement('div');
+    div.className = 'week-day' + (isActive ? ' active' : '') + (dayBookings.length > 0 ? ' has-bookings' : '');
+    div.innerHTML = `
+      <div class="wd-label">${fmtDay(d)}</div>
+      <div class="wd-num">${d.getDate()}</div>
+      <div class="wd-count">${dayBookings.length > 0 ? dayBookings.length + ' booked' : 'Open'}</div>
+      <div class="wd-dot"></div>
+    `;
+    div.addEventListener('click', () => { currentDate = d; render(); });
+    strip.appendChild(div);
+  }
+}
+
+function renderStats() {
+  const ds = fmt(currentDate);
+  const todayBookings = getBookingsForDate(ds);
+  const avail = OFFICES.length - todayBookings.length;
+  document.getElementById('statAvail').textContent = avail;
+  document.getElementById('statBooked').textContent = todayBookings.length;
+  // Count user's bookings this week
+  const ws = getWeekStart(currentDate);
+  let myCount = 0;
+  for (let i = 0; i < 5; i++) {
+    const d = fmt(addDays(ws, i));
+    bookings.forEach(b => { if (b.date === d && b.bookedBy === currentUser) myCount++; });
+  }
+  document.getElementById('statMine').textContent = myCount;
+}
+
+function renderOfficeList() {
+  const ds = fmt(currentDate);
+  const list = document.getElementById('officeList');
+  list.innerHTML = '';
+  let shown = 0;
+  OFFICES.forEach(office => {
+    const booking = getBookingForOfficeDate(office.id, ds);
+    const status = booking ? 'reserved' : 'available';
+    if (currentFilter !== 'all' && currentFilter !== status) return;
+    shown++;
+
+    const row = document.createElement('div');
+    row.className = 'office-row';
+
+    const typeClass = office.type === 'exec' ? 'exec' : office.type === 'conf' ? 'conf' : 'open';
+    const statusLabel = booking ? 'Reserved' : 'Available';
+    const statusClass = booking ? 'reserved' : 'available';
+
+    let actionBtn = '';
+    if (booking) {
+      if (booking.bookedBy === currentUser) {
+        actionBtn = `<button class="book-btn cancel" onclick="openCancel('${booking.id}','${office.name}','${booking.guest}')">Cancel</button>`;
+      } else {
+        actionBtn = `<button class="book-btn" disabled>Reserved</button>`;
+      }
+    } else {
+      actionBtn = `<button class="book-btn" onclick="openBookModal('${office.id}')">Reserve</button>`;
+    }
+
+    row.innerHTML = `
+      <div class="office-icon ${typeClass}">${office.icon}</div>
+      <div class="office-info">
+        <div class="office-name">${office.name}</div>
+        <div class="office-meta">${office.floor} · ${office.features}</div>
+        ${booking ? `<div class="booking-info"><span class="booking-person">${booking.guest}</span> · ${fmt12(booking.start)}–${fmt12(booking.end)} · Booked by ${booking.bookedBy}</div>` : ''}
+      </div>
+      <div class="office-status">
+        <span class="status-badge ${statusClass}"><span class="status-dot"></span>${statusLabel}</span>
+        ${booking ? '' : ''}
+      </div>
+      ${actionBtn}
+    `;
+    list.appendChild(row);
+  });
+
+  if (shown === 0) {
+    list.innerHTML = '<div style="padding:32px;text-align:center;color:var(--muted);font-size:14px;">No offices match this filter.</div>';
+  }
+}
+
+function renderActivity() {
+  const feed = document.getElementById('activityFeed');
+  feed.innerHTML = '';
+  activity.slice(0, 5).forEach(a => {
+    const item = document.createElement('div');
+    item.className = 'activity-item';
+    const color = COLORS[a.user] || '#ccc';
+    const actionVerb = a.action === 'reserved' ? '📅 reserved' : '❌ cancelled';
+    item.innerHTML = `
+      <div class="activity-avatar" style="background:${color}20;color:${color}">${initials(a.user)}</div>
+      <div>
+        <div class="activity-text"><strong>${a.user}</strong> ${actionVerb} <strong>${a.office}</strong> for ${a.guest}</div>
+        <div class="activity-time">${a.time}</div>
+      </div>
+    `;
+    feed.appendChild(item);
+  });
+}
+
+function renderQuickBookOffices() {
+  const sel = document.getElementById('officeSelect');
+  sel.innerHTML = '';
+  OFFICES.forEach(o => {
+    const opt = document.createElement('option');
+    opt.value = o.id;
+    opt.textContent = o.name;
+    sel.appendChild(opt);
+  });
+  // Set default date
+  document.getElementById('bookDate').value = fmt(currentDate);
+}
+
+// ─── INTERACTIONS ─────────────────────────────────────────
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderOfficeList();
+}
+
+function switchUser(name) {
+  currentUser = name;
+  document.getElementById('avatarInitials').textContent = initials(name);
+  render();
+}
+
+function shiftWeek(n) {
+  currentDate = addDays(currentDate, n * 7);
+  render();
+}
+
+function goToday() {
+  currentDate = new Date(); currentDate.setHours(0,0,0,0);
+  render();
+}
+
+function onDatePick(val) {
+  currentDate = new Date(val + 'T00:00:00');
+  render();
+}
+
+// ─── MODAL BOOK ───────────────────────────────────────────
+function openBookModal(officeId) {
+  pendingBookOfficeId = officeId;
+  const office = OFFICES.find(o => o.id === officeId);
+  document.getElementById('modalTitle').textContent = `Reserve ${office.name}`;
+  document.getElementById('modalSubtitle').textContent = `${office.floor} · ${office.features}`;
+  document.getElementById('modalDate').value = fmt(currentDate);
+  document.getElementById('modalGuest').value = '';
+  document.getElementById('modalNotes').value = '';
+  document.getElementById('modalConflict').classList.remove('show');
+  document.getElementById('bookModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('bookModal').classList.remove('open');
+}
+
+function confirmBook() {
+  const guest = document.getElementById('modalGuest').value.trim();
+  const date = document.getElementById('modalDate').value;
+  const start = document.getElementById('modalStart').value;
+  const end = document.getElementById('modalEnd').value;
+  const notes = document.getElementById('modalNotes').value.trim();
+
+  if (!guest) { document.getElementById('modalGuest').focus(); return; }
+
+  // Conflict check
+  const existing = getBookingForOfficeDate(pendingBookOfficeId, date);
+  if (existing) {
+    document.getElementById('modalConflictMsg').textContent = `Already reserved for ${existing.guest} (${fmt12(existing.start)}–${fmt12(existing.end)}) by ${existing.bookedBy}.`;
+    document.getElementById('modalConflict').classList.add('show');
+    return;
+  }
+
+  const office = OFFICES.find(o => o.id === pendingBookOfficeId);
+  const id = 'b' + Date.now();
+  bookings.push({ id, officeId: pendingBookOfficeId, guest, date, start, end, bookedBy: currentUser, notes });
+  activity.unshift({ user: currentUser, action: 'reserved', office: office.name, guest, time: 'Just now' });
+
+  closeModal();
+  render();
+  showToast('success', `✅ ${office.name} reserved for ${guest}. Calendar invite sent to all coordinators.`);
+}
+
+// ─── QUICK BOOK ───────────────────────────────────────────
+function quickBook() {
+  const guest = document.getElementById('guestName').value.trim();
+  const officeId = document.getElementById('officeSelect').value;
+  const date = document.getElementById('bookDate').value;
+  const start = document.getElementById('timeStart').value;
+  const end = document.getElementById('timeEnd').value;
+  const notes = document.getElementById('bookNotes').value.trim();
+
+  if (!guest) { document.getElementById('guestName').focus(); return; }
+
+  const existing = getBookingForOfficeDate(officeId, date);
+  if (existing) {
+    const office = OFFICES.find(o => o.id === officeId);
+    document.getElementById('conflictMsg').textContent = `${office.name} is already reserved on that date for ${existing.guest} by ${existing.bookedBy}.`;
+    document.getElementById('conflictBanner').classList.add('show');
+    return;
+  }
+  document.getElementById('conflictBanner').classList.remove('show');
+
+  const office = OFFICES.find(o => o.id === officeId);
+  const id = 'b' + Date.now();
+  bookings.push({ id, officeId, guest, date, start, end, bookedBy: currentUser, notes });
+  activity.unshift({ user: currentUser, action: 'reserved', office: office.name, guest, time: 'Just now' });
+
+  document.getElementById('guestName').value = '';
+  document.getElementById('bookNotes').value = '';
+
+  // Update date to match currentDate
+  const d = new Date(date + 'T00:00:00');
+  currentDate = d;
+  render();
+  showToast('success', `✅ Reserved ${office.name} for ${guest}. Outlook invite sent.`);
+}
+
+// ─── CANCEL ───────────────────────────────────────────────
+function openCancel(bookingId, officeName, guest) {
+  pendingCancelId = bookingId;
+  document.getElementById('cancelSubtitle').textContent = `${officeName}`;
+  document.getElementById('cancelBody').textContent = `Cancel the reservation for "${guest}"? All 4 coordinators will be notified via Outlook.`;
+  document.getElementById('cancelModal').classList.add('open');
+}
+
+function confirmCancel() {
+  const booking = bookings.find(b => b.id === pendingCancelId);
+  if (booking) {
+    const office = OFFICES.find(o => o.id === booking.officeId);
+    activity.unshift({ user: currentUser, action: 'cancelled', office: office.name, guest: booking.guest, time: 'Just now' });
+    bookings = bookings.filter(b => b.id !== pendingCancelId);
+  }
+  document.getElementById('cancelModal').classList.remove('open');
+  render();
+  showToast('error', `❌ Reservation cancelled. Coordinators notified.`);
+}
+
+// ─── TOAST ────────────────────────────────────────────────
+let toastTimer;
+function showToast(type, msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.classList.remove('show'); }, 4000);
+}
+
+// ─── INIT ─────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
